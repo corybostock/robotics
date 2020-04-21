@@ -4,11 +4,11 @@ clc
 clf
 clear
 
-% startup_rvc;
-floorOffset = (-1.8453/2);
-workspace = [-2 2 -2 2 floorOffset 2];
+% startup_rvc;                                                              % Ensuring robotics toolbox is active and functional
+floorOffset = (-1.0896/2);                                                  % measured height or table in body0.ply
+workspace = [-3 3 -3 3 floorOffset 1.5];
 
-
+% define Robot coordinates
 x1 = input('Robot 1 base X coordinate: ');
 y1 = input('Robot 1 base Y coordinate: ');
 z1 = input('Robot 1 base Z coordinate: ');
@@ -18,14 +18,14 @@ y2 = input('Robot 2 base Y coordinate: ');
 z2 = input('Robot 2 base Z coordinate: ');
 robotLoc2 = transl(x2, y2, z2);
 
-robot1 = UR3Model(workspace, robotLoc1, 1);
-hold on;
-robot2 = UR3Model(workspace, robotLoc2, 1);
-table = body(workspace, 0, transl(0,0,floorOffset));
-
-
-
-
+% Making robot and environment objects
+robot1      = UR3Model(workspace, robotLoc1, 1);
+robot2      = UR3Model(workspace, robotLoc2, 1);
+table       = body(workspace, 0, transl(0,0,floorOffset));                  % Dimensions of the table (x, y, z) = (1.4880, 2.3383, 1.0896)
+barrier1    = body(workspace, 1, transl(0,2,floorOffset));                  % Dimensions of the barrier (x, y, z) = (3.3951, 0.7129, 1.7555)
+barrier2    = body(workspace, 2, transl(2,0,floorOffset));
+barrier3    = body(workspace, 3, transl(0,-2,floorOffset));
+barrier4    = body(workspace, 4, transl(-2,0,floorOffset));
 
 
 
