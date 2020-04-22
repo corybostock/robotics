@@ -8,15 +8,12 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
     end
     
     methods
-        function self = UR3Model(workspace,location,draw)
+        function self = UR3Model(workspace,location)
             self.workspace = workspace;
             self.GetRobot();
             self.currentJoints = zeros(1,6);
             self.model.base = location;
-            
-            if draw
-                self.PlotAndColour(self.location);
-            end
+            self.PlotAndColour(self.location);
             
         end
         function PlotAndColour(self,location)
