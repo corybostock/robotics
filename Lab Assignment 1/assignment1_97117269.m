@@ -18,39 +18,21 @@ y2 = input('Robot 2 base Y coordinate: ');
 z2 = input('Robot 2 base Z coordinate: ');
 robotLoc2 = transl(x2, y2, z2);
 
+% PLY files for the UR3 have been face/vertex decimated heavily for 
+% resposive animations and reduced computational time. 
+% The imperfections in the surfaces allow this response time.
+
 % Making robot and environment objects
-robot1          = UR3Model(workspace, robotLoc1);
-robot2          = UR3Model(workspace, robotLoc2);
+robot1          = UR3Model(workspace, 0, robotLoc1);                           
+robot2          = UR3Model(workspace, 1, robotLoc2);
 table           = body(workspace, 0, transl(0,0,floorOffset));              % Dimensions of the table (x, y, z) = (1.4880, 2.3383, 1.0896)
 barrier1        = body(workspace, 1, transl(0,2,floorOffset));              % Dimensions of the barrier (x, y, z) = (3.3951, 0.7129, 1.7555)
 barrier2        = body(workspace, 2, transl(2,0,floorOffset));
 barrier3        = body(workspace, 3, transl(0,-2,floorOffset));
 barrier4        = body(workspace, 4, transl(-2,0,floorOffset));
-topHousing      = body(workspace, 5, transl(0,0,floorOffset));              % Top Housing
-bottomHousing   = body(workspace, 6, transl(0,0,floorOffset));              % Bottom Housing
-pcb             = body(workspace, 7, transl(0,0,floorOffset));              % PCB
-
-
-% % get pose
-% tempq = UR3_1.ikine(housing_bottom_pose)
-% UR3_1q = zeros(size(linkList)); 
-% UR3_1.plot(UR3_1q)
-% 
-% % animate 1 
-% jointTrajectory = jtraj(UR3_1.getpos(), tempq,60)
-% 
-% for trajStep = 1:size(jointTrajectory,1)
-%     q = jointTrajectory(trajStep,:);
-%     UR3_1.animate(q);
-%     pause(0.001);
-%     trajStep
-% end
-
-
-
-
-
-
+topHousing      = body(workspace, 5, transl(-0.5,0,0));                     % Top Housing
+bottomHousing   = body(workspace, 6, transl(0,0,0));                        % Bottom Housing
+pcb             = body(workspace, 7, transl(0.5,0,0));                      % PCB
 
 
 

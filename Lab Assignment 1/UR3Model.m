@@ -8,9 +8,9 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
     end
     
     methods
-        function self = UR3Model(workspace,location)
+        function self = UR3Model(workspace,roboNum, location)
             self.workspace = workspace;
-            self.GetRobot();
+            self.GetRobot(roboNum);
             self.currentJoints = zeros(1,6);
             self.model.base = location;
             self.PlotAndColour(self.location);
@@ -44,7 +44,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
             end    
         end
         
-        function GetRobot(self) % Setup Robot Parameters
+        function GetRobot(self, roboNum) % Setup Robot Parameters
             pause(0.001);
             L1 = Link('d',0.1519,'a',0,'alpha',pi/2,'qlim',deg2rad([-360 360]));
             L2 = Link('d',0,'a',-0.24365,'alpha',0,'qlim',deg2rad([-360 360]));
@@ -54,7 +54,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
             L6 = Link('d',0.0819,'a',0,'alpha',0,'qlim',deg2rad([-360 360]));
             
             pause(0.0001)
-            name = ['UR_3_',datestr(now,'yyyymmddTHHMMSSFFF')];
+            name = ['UR_3_',roboNum];
             self.model = SerialLink([L1 L2 L3 L4 L5 L6], 'name', name);             
         end
     end
