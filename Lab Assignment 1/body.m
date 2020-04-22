@@ -29,9 +29,6 @@ classdef body < handle % class to handle setting up of the static body
             % Display body
             self.model.base = location;
             self.model.plot3d(0, 'workspace', workspace);
-            if isempty(findobj(get(gca,'Children'),'Type','Light'))
-                camlight;
-            end
             
             for linkIndex = 0:self.model.n
                 handles = findobj('Tag', self.model.name);
