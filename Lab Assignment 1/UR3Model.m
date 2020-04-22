@@ -4,7 +4,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
         currentJoints;
         location;
         workspace;
-        plyData;   
+        plyData;
     end
     
     methods
@@ -18,7 +18,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
         end
         function PlotAndColour(self,location)
             for linkIndex = 0:self.model.n
-                [ faceData, vertexData, plyData{linkIndex + 1} ] = plyread(['link',num2str(linkIndex),'.ply'],'tri'); %#ok<AGROW>
+                [ faceData, vertexData, plyData{linkIndex + 1} ] = plyread(['link',num2str(linkIndex),'.ply'],'tri');
                 self.model.faces{linkIndex + 1} = faceData;
                 self.model.points{linkIndex + 1} = vertexData;
             end
@@ -56,6 +56,100 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
             pause(0.0001)
             name = ['UR_3_',roboNum];
             self.model = SerialLink([L1 L2 L3 L4 L5 L6], 'name', name);             
+        end
+        
+        function maxRadius(self)
+            disp('Checking arm reach... ');
+            pause(0.5);
+            % Robot arm extended to max upwards pose
+            q = [0,-90,0,-90,0,0];
+            self.model.animate(deg2rad(q));
+            endefect = self.model.fkine(deg2rad(q));
+            maxLengthPos = abs( endefect(1:3,4)' - [0,0,0.1519] );          % subtracting base link
+            pause(0.5);
+
+            % Robot arm extended to max downward pose
+            q = [0,90,0,-90,0,0];
+            self.model.animate(deg2rad(q));
+            endefect = self.model.fkine(deg2rad(q));
+            maxLengthNeg = endefect(1:3,4)' - [0,0,0.1519];
+            pause(0.5);
+            self.model.animate(zeros(1,6));
+
+            % Perfect sphere max volume
+            disp('Volume in metres cubed of unrestricted robot reach: ');
+            maxVol = ( 4 * pi * maxLengthPos(3)^3 ) / 3
+
+            % doesn't yet include floor must ask
+            % https://mathworld.wolfram.com/SphericalCap.html?fbclid=IwAR13igaa2iavUjBd3vyHoOVTVOrUEAFUITtciWRmLwOi0T3nV4ReMzjtfS8
+            h = maxLengthPos(3) - maxLengthNeg(3);
+            disp('Volume in metres cubed of spherical cap: ');
+            maxVol = (pi * h^2 * (3 * maxLengthPos(3) - h)) / 3
+
+            % 0.24365 is only for the mdl arm replace with math from link to work out
+            % variable for first arm
+            redundant_vol = pi * 0.24365^2 *  abs(maxLengthNeg(3));
+            disp('Volume in metres cubed the robot can navigate to: ');
+            maxVol = maxVol - redundant_vol
+        end
+        
+        function calcPointCloud(self)
+            calc = input('Load Point cloud from file? 0 - No, 1 - Yes: ');
+            
+            if calc == 0
+                disp('Calculating Point Cloud... ');
+                stepRads = deg2rad(90);
+                qlim = self.model.qlim;
+                pointCloudeSize = prod(floor((qlim(1:5,2)-qlim(1:5,1))/stepRads + 1));
+                pointCloud = zeros(pointCloudeSize,3);
+                counter = 1;
+                tic;
+                for q1 = qlim(1,1):stepRads:qlim(1,2)
+                    for q2 = qlim(2,1):stepRads:qlim(2,2)
+                        for q3 = qlim(3,1):stepRads:qlim(3,2)
+                            for q4 = qlim(4,1):stepRads:qlim(4,2)
+                                for q5 = qlim(5,1):stepRads:qlim(5,2)
+                                    % Don't need to worry about joint 6, just assume it=0
+                                    q6 = 0;
+                                    q = [q1,q2,q3,q4,q5,q6];
+                                    if (self.limitCheck(q) == 1)
+                                        tr = self.model.fkine(q);                        
+                                        pointCloud(counter,:) = tr(1:3,4)';
+                                        counter = counter + 1;
+                                        if mod(counter/pointCloudeSize * 100,1) == 0
+                                            disp(['After ',num2str(toc),' seconds, completed ',num2str(counter/pointCloudeSize * 100),'% of poses']);
+                                        end
+                                    end
+                                 end
+                             end
+                         end
+                     end
+                end
+                save('pCloud', 'pointCloud');
+            end
+            
+            if calc == 1
+                load('pCloud');
+            end
+            
+            plot3(pointCloud(:,1),pointCloud(:,2),pointCloud(:,3),'r.');
+            [k, Max_Vol] = convhull(pointCloud);
+            Max_Vol
+            
+        end
+        
+        function [t] = limitCheck(self, jointAngles)
+            joints = jointAngles;
+            t = 1;
+            [rows, columns] = size(joints);
+            currentLink = transl(0,0,0);                                    % assuming robot is at the origin
+            for joint = 1:columns
+                currentLink = currentLink * self.model.A(joint,joints);
+                if(currentLink(3,4) < 0)
+                    t = 0;
+                    return
+                end
+            end
         end
     end
 end
