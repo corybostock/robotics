@@ -26,7 +26,7 @@ robotLoc1 = transl(x1, y1, z1);
 % The imperfections in the surfaces allow this response time.
 
 % Making robot and environment objects
-robot1          = UR3Model(workspace, 0, robotLoc1);                           
+robot1          = UR3Model(workspace, 0, robotLoc1);
 % robot2          = UR3Model(workspace, 1, robotLoc2);
 % table           = body(workspace, 0, transl(0,0,floorOffset));              % Dimensions of the table (x, y, z) = (1.4880, 2.3383, 1.0896)
 % barrier1        = body(workspace, 1, transl(0,2,floorOffset));              % Dimensions of the barrier (x, y, z) = (3.3951, 0.7129, 1.7555)
@@ -38,5 +38,7 @@ robot1          = UR3Model(workspace, 0, robotLoc1);
 % pcb             = body(workspace, 7, transl(0.5,0,0));                      % PCB
 
 % ------------------------------------------
-% robot1.maxRadius();
-robot1.calcPointCloud();
+robot1.maxRadius();                                                         % Mathematical calc of max radius and volume reach
+robot1.calcPointCloud();                                                    % Point cloud calc of max radius and volume reach
+robot1.view(0);                                                             % Top view
+robot1.view(1);                                                             % Side view

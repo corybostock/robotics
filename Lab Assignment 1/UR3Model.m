@@ -80,11 +80,10 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
             disp('Volume in metres cubed of unrestricted robot reach: ');
             maxVol = ( 4 * pi * maxLengthPos(3)^3 ) / 3
 
-            % doesn't yet include floor must ask
             % https://mathworld.wolfram.com/SphericalCap.html?fbclid=IwAR13igaa2iavUjBd3vyHoOVTVOrUEAFUITtciWRmLwOi0T3nV4ReMzjtfS8
-            h = maxLengthPos(3) - maxLengthNeg(3);
-            disp('Volume in metres cubed of spherical cap: ');
-            maxVol = (pi * h^2 * (3 * maxLengthPos(3) - h)) / 3
+%             h = maxLengthPos(3) - maxLengthNeg(3);
+%             disp('Volume in metres cubed of spherical cap: ');
+%             maxVol = (pi * h^2 * (3 * maxLengthPos(3) - h)) / 3
 
             % 0.24365 is only for the mdl arm replace with math from link to work out
             % variable for first arm
@@ -94,9 +93,9 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
         end
         
         function calcPointCloud(self)
-            calc = input('Load Point cloud from file? 0 - No, 1 - Yes: ');
+            loadFile = input('Load Point cloud from file? 0 - No, 1 - Yes: ');
             
-            if calc == 0
+            if loadFile == 0
                 disp('Calculating Point Cloud... ');
                 stepRads = deg2rad(90);
                 qlim = self.model.qlim;
@@ -128,7 +127,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
                 save('pCloud', 'pointCloud');
             end
             
-            if calc == 1
+            if loadFile == 1
                 load('pCloud');
             end
             
@@ -151,5 +150,21 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
                 end
             end
         end
+        
+        function view(self, type)
+            switch type
+                case 0 % top view
+                    disp('Maximum reach upwards');
+                    q = [0,-90,0,-90,0,0];
+                    self.model.animate(deg2rad(q));
+                case 1 % side view
+                    disp('Maximum reach sideways');
+                    q = [90,0,0,-90,0,0];
+                    self.model.animate(deg2rad(q));
+            end
+            
+            input('Observe the robot arm position, press enter to continue: ');
+            
+        end        
     end
 end
