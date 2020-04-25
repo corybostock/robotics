@@ -5,6 +5,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
         location;
         workspace;
         plyData;
+        radius;
     end
     
     methods
@@ -74,8 +75,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
             endefect = self.model.fkine(deg2rad(q));
             maxLengthNeg = endefect(1:3,4)' - [0,0,0.1519];
             pause(0.5);
-            self.model.animate(zeros(1,6));
-
+            
             % Perfect sphere max volume
             disp('Volume in metres cubed of unrestricted robot reach: ');
             maxVol = ( 4 * pi * maxLengthPos(3)^3 ) / 3
@@ -90,14 +90,19 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
             redundant_vol = pi * 0.24365^2 *  abs(maxLengthNeg(3));
             disp('Volume in metres cubed the robot can navigate to: ');
             maxVol = maxVol - redundant_vol
+            
+            q = [90,0,0,-90,0,0];
+            self.model.animate(deg2rad(q));
+            endefect = self.model.fkine(deg2rad(q));
+            self.radius = abs( endefect(2,4));
         end
         
-        function calcPointCloud(self)
+        function calcPointCloud(self, instance)
             loadFile = input('Load Point cloud from file? 0 - No, 1 - Yes: ');
             
             if loadFile == 0
                 disp('Calculating Point Cloud... ');
-                stepRads = deg2rad(90);
+                stepRads = deg2rad(30);
                 qlim = self.model.qlim;
                 pointCloudeSize = prod(floor((qlim(1:5,2)-qlim(1:5,1))/stepRads + 1));
                 pointCloud = zeros(pointCloudeSize,3);
@@ -114,10 +119,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
                                     if (self.limitCheck(q) == 1)
                                         tr = self.model.fkine(q);                        
                                         pointCloud(counter,:) = tr(1:3,4)';
-                                        counter = counter + 1;
-                                        if mod(counter/pointCloudeSize * 100,1) == 0
-                                            disp(['After ',num2str(toc),' seconds, completed ',num2str(counter/pointCloudeSize * 100),'% of poses']);
-                                        end
+                                        counter = counter + 1
                                     end
                                  end
                              end
@@ -131,6 +133,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
                 load('pCloud');
             end
             
+            figure(instance);
             plot3(pointCloud(:,1),pointCloud(:,2),pointCloud(:,3),'r.');
             [k, Max_Vol] = convhull(pointCloud);
             Max_Vol
