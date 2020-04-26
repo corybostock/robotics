@@ -1,8 +1,6 @@
 classdef body < handle % class to handle setting up of the static body
     properties
         model;
-        faceData;
-        vertexData;
         plyData;
         workspace;
         location;
@@ -15,16 +13,17 @@ classdef body < handle % class to handle setting up of the static body
         end
                
         function plotAndColour(self, workspace, bodyNum, location)
-            if isempty(self.faceData) || isempty(self.vertexData) || isempty(self.plyData)
-                [self.faceData,self.vertexData,self.plyData] = plyread(['body', num2str(bodyNum), '.ply'],'tri');
-                % ply file data of bodys is stored for each body
+            for linkIndex = 0:1
+                [ faceData, vertexData, plyData{linkIndex + 1} ] = plyread(['body', num2str(bodyNum),'.ply'],'tri');
+                self.model.faces{linkIndex + 1} = faceData;
+                self.model.points{linkIndex + 1} = vertexData;
             end
             
             L1 = Link('alpha',0,'a',1,'d',0,'offset',0);
             self.model = SerialLink(L1, 'name' , ['body', num2str(bodyNum)]);
             % 1 link robot used to simulate bodys for simplicity
-            self.model.faces = {self.faceData,[]};
-            self.model.points = {self.vertexData,[]};
+            self.model.faces = {faceData,[]};
+            self.model.points = {vertexData,[]};
             
             % Display body
             self.model.base = location;

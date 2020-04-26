@@ -14,10 +14,10 @@ classdef UR3Model < handle % setup the UR3 robot
             self.GetRobot(roboNum);
             self.currentJoints = zeros(1,6);
             self.model.base = location;
-            self.PlotAndColour(self.location);
+            self.PlotAndColour();
             
         end
-        function PlotAndColour(self,location)
+        function PlotAndColour(self)
             for linkIndex = 0:self.model.n
                 [ faceData, vertexData, plyData{linkIndex + 1} ] = plyread(['link',num2str(linkIndex),'.ply'],'tri');
                 self.model.faces{linkIndex + 1} = faceData;
@@ -73,7 +73,8 @@ classdef UR3Model < handle % setup the UR3 robot
             q = [0,90,0,-90,0,0];
             self.model.animate(deg2rad(q));
             endefect = self.model.fkine(deg2rad(q));
-            maxLengthNeg = endefect(1:3,4)' - [0,0,0.1519]    % Subtracting the base link
+            firstLink = self.model.links.d
+            maxLengthNeg = endefect(1:3,4)' - [0,0,firstLink]    % Subtracting the base link
             pause(0.5);
             
             % Perfect sphere max volume
