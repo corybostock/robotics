@@ -98,7 +98,7 @@ classdef UR3Model < handle % setup the UR3 robot
             self.radius = abs( endefect(2,4))';
         end
         
-        function calcPointCloud(self, instance)
+        function calcPointCloud(self)
             loadFile = input('Load Point cloud from file? 0 - No, 1 - Yes: ');
             
             if loadFile == 0
@@ -134,11 +134,12 @@ classdef UR3Model < handle % setup the UR3 robot
                 load('pCloud');
             end
             
-            figure(instance);
-            plot3(pointCloud(:,1),pointCloud(:,2),pointCloud(:,3),'r.');
+            hold on
+            pCloudOverlay = plot3(pointCloud(:,1),pointCloud(:,2),pointCloud(:,3),'r.');
+            input('Press enter to remove point cloud overlay');
             [k, Max_Vol] = convhull(pointCloud);
             Max_Vol
-            
+            delete(pCloudOverlay)
         end
         
         function [t] = limitCheck(self, jointAngles)

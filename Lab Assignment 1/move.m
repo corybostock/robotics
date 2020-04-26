@@ -14,9 +14,8 @@ classdef move < handle % Movement of robots or bodies
             for step = 1:size(trajectory,1)
                 q = trajectory(step,:);
                 robot.model.animate(q);
-                pause(0.01);
+                pause(0.001);
             end
-            pause(0.01);
         end
     end
 end

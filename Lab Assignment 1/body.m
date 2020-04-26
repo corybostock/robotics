@@ -9,7 +9,6 @@ classdef body < handle % class to handle setting up of the static body
     methods
         function self = body(workspace, bodyNum, location)
             self.plotAndColour(workspace, bodyNum, location);
-            camlight;
         end
                
         function plotAndColour(self, workspace, bodyNum, location)
