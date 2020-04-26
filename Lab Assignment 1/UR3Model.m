@@ -1,4 +1,4 @@
-classdef UR3Model < handle % setup and move the UR3 robot, as well as log its transforms
+classdef UR3Model < handle % setup the UR3 robot
     properties
         model;
         currentJoints;
@@ -48,12 +48,12 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
         function GetRobot(self, roboNum) % Setup Robot Parameters
             pause(0.001);
             L1 = Link('d',0.1519,'a',0,'alpha',pi/2,'qlim',deg2rad([-360 360]));
-            L2 = Link('d',0,'a',-0.24365,'alpha',0,'qlim',deg2rad([-360 360]));
-            L3 = Link('d',0,'a',-0.21325,'alpha',0,'qlim',deg2rad([-360 360]));
+            L2 = Link('d',0,'a',-0.24365,'alpha',0,'qlim',deg2rad([-180 0]));
+            L3 = Link('d',0,'a',-0.21325,'alpha',0,'qlim',deg2rad([-180 180]));
             L4 = Link('d',0.11235,'a',0,'alpha',pi/2,'qlim',deg2rad([-360 360]));
             L5 = Link('d',0.08535,'a',0,'alpha',-pi/2,'qlim',deg2rad([-360 360]));
             L6 = Link('d',0.0819,'a',0,'alpha',0,'qlim',deg2rad([-360 360]));
-            
+                        
             pause(0.0001)
             name = ['UR_3_',roboNum];
             self.model = SerialLink([L1 L2 L3 L4 L5 L6], 'name', name);             
@@ -66,14 +66,14 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
             q = [0,-90,0,-90,0,0];
             self.model.animate(deg2rad(q));
             endefect = self.model.fkine(deg2rad(q));
-            maxLengthPos = abs( endefect(1:3,4)' - [0,0,0.1519] );          % subtracting base link
+            maxLengthPos = abs( endefect(1:3,4)')          % including the base link
             pause(0.5);
 
             % Robot arm extended to max downward pose
             q = [0,90,0,-90,0,0];
             self.model.animate(deg2rad(q));
             endefect = self.model.fkine(deg2rad(q));
-            maxLengthNeg = endefect(1:3,4)' - [0,0,0.1519];
+            maxLengthNeg = endefect(1:3,4)' - [0,0,0.1519]    % Subtracting the base link
             pause(0.5);
             
             % Perfect sphere max volume
@@ -94,7 +94,7 @@ classdef UR3Model < handle % setup and move the UR3 robot, as well as log its tr
             q = [90,0,0,-90,0,0];
             self.model.animate(deg2rad(q));
             endefect = self.model.fkine(deg2rad(q));
-            self.radius = abs( endefect(2,4));
+            self.radius = abs( endefect(2,4))';
         end
         
         function calcPointCloud(self, instance)
