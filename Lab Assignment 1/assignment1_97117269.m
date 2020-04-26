@@ -62,18 +62,23 @@ end
 % robot1.view(1);                                                                             % Side view
 
 % ------------------------------------------
+disp('Picking up top housing...');
 motion.moveRobot(robot1, topHousingPose * trotx(pi) * objectOffset);
 motion.moveRobot(robot1, topHousingPose * trotx(pi));
 
+disp('Picking up PCB...');
 motion.moveRobot(robot2, pcbPose * trotx(pi) * objectOffset);
 motion.moveRobot(robot2, pcbPose * trotx(pi));
 
-motion.moveRobot(robot1, midpoint * trotx(pi));
-motion.moveRobot(robot2, midpoint * trotx(pi));
+disp('Bringing PCB and top housing to midpoint...');
+motion.moveRobotAndPart(robot1, midpoint * trotx(pi), topHousing);
+motion.moveRobotAndPart(robot2, midpoint * trotx(pi), pcb);
 
+disp('Picking up bottom housing...');
 motion.moveRobot(robot2, bottomHousingPose * trotx(pi) * objectOffset);
 motion.moveRobot(robot2, bottomHousingPose * trotx(pi));
 
-motion.moveRobot(robot2, midpoint * trotx(pi));
+disp('Bringing bottom housing to midpoint...');
+motion.moveRobotAndPart(robot2, midpoint * trotx(pi), bottomHousing);
 
 robot2.model.teach();
