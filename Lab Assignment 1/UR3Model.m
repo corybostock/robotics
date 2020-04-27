@@ -55,7 +55,7 @@ classdef UR3Model < handle % setup the UR3 robot
             L6 = Link('d',0.0819,'a',0,'alpha',0,'qlim',deg2rad([-360 360]));
                         
             pause(0.0001)
-            name = ['UR_3_',roboNum];
+            name = ['UR_3_',num2str(roboNum)];
             self.model = SerialLink([L1 L2 L3 L4 L5 L6], 'name', name);             
         end
         
