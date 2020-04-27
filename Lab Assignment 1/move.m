@@ -26,8 +26,26 @@ classdef move < handle % Movement of robots or bodies
                 q = trajectory(step,:);
                 robot.model.animate(q);
                 endefect = robot.model.fkine(q);
-                part.model.base = transl(endefect(1:3,4)');
+                part.model.base = endefect * trotx(pi);
                 part.model.animate(0);
+                pause(0.001);
+            end
+        end
+        
+        function moveRobotAndAllParts(self, robot, targetPos, part1, part2, part3)
+            tempq = robot.model.ikcon(targetPos, robot.model.getpos());
+            trajectory = jtraj(robot.model.getpos(), tempq ,25);
+            
+            for step = 1:size(trajectory,1)
+                q = trajectory(step,:);
+                robot.model.animate(q);
+                endefect = robot.model.fkine(q);
+                part1.model.base = endefect * trotx(pi);
+                part2.model.base = part1.model.base;
+                part3.model.base = part1.model.base;
+                part1.model.animate(0);
+                part2.model.animate(0);
+                part3.model.animate(0);
                 pause(0.001);
             end
         end
