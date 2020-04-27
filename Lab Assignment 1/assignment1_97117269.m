@@ -4,7 +4,7 @@ clc
 clf
 clear
 
-% startup_rvc;                                                                % Ensuring robotics toolbox is active and functional
+startup_rvc;                                                                % Ensuring robotics toolbox is active and functional
 floorOffset = (-1.0896/2);                                                  % measured height or table in body0.ply
 objectOffset = transl(0, 0 , -0.1);                                         % offset to lower endeffector onto object 
 workspace = [-2.5 2.5 -2.5 2.5 (2*floorOffset) 1];
