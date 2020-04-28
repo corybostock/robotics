@@ -7,8 +7,13 @@ classdef move < handle % Movement of robots or bodies
            
         end     
         
-        function moveRobot(self, robot, targetPos)
-            tempq = robot.model.ikcon(targetPos, robot.model.getpos());
+        function moveRobot(self, robot, targetPos, qtype)
+            if (qtype == 1)
+                tempq = robot.model.ikcon(targetPos, robot.model.getpos());
+            else
+                tempq = robot.model.ikine(targetPos);
+            end
+            
             trajectory = jtraj(robot.model.getpos(), tempq ,50);
             
             for step = 1:size(trajectory,1)

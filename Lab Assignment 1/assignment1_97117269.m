@@ -11,20 +11,23 @@ workspace = [-2.5 2.5 -2.5 2.5 (2*floorOffset) 1];
 % workspace = [-1.5 1.5 -1.5 1.5 0 1.5];
 
 % define Robot coordinates
-x1 = input('Robot 1 base X coordinate: ');
-y1 = input('Robot 1 base Y coordinate: ');
-z1 = input('Robot 1 base Z coordinate: ');
-robotLoc1 = transl(x1, y1, z1);
-x2 = input('Robot 2 base X coordinate: ');
-y2 = input('Robot 2 base Y coordinate: ');
-z2 = input('Robot 2 base Z coordinate: ');
-robotLoc2 = transl(x2, y2, z2);
+% x1 = input('Robot 1 base X coordinate: ');
+% y1 = input('Robot 1 base Y coordinate: ');
+% z1 = input('Robot 1 base Z coordinate: ');
+% robotLoc1 = transl(x1, y1, z1);
+% x2 = input('Robot 2 base X coordinate: ');
+% y2 = input('Robot 2 base Y coordinate: ');
+% z2 = input('Robot 2 base Z coordinate: ');
+% robotLoc2 = transl(x2, y2, z2);
+
+robotLoc1 = transl(-0.23,0.23,0);
+robotLoc2 = transl(0.23,0.23,0);
 
 % define object coordinates
-topHousingPose      = transl(0.2,-0.3,0);                                     
-bottomHousingPose   = transl(0.2,0,0);                                        
-pcbPose             = transl(0.2,0.3,0);
-boxPose             = transl(-0.15,0,0)* trotz(pi/2);
+topHousingPose      = transl(-0.42,0.46,0);                                     
+bottomHousingPose   = transl(0.42,0.46,0);                                        
+pcbPose             = transl(0.15,0.15,0);
+boxPose             = transl(0,-0.15,0);
 
 % ------------------------------------------
 
@@ -61,6 +64,8 @@ else
     midpoint = transl(midpoint) * transl(0,0,max(midpoint)/2);
 end
 
+origin = transl(0,0,0.15);
+
 % ------------------------------------------
 % Max volume and radius information
 robot1.calcPointCloud();                                                                   % Point cloud calc of max radius and volume reach.                                                                               % Setting target figure back to figure 1
@@ -68,33 +73,27 @@ robot1.view(0);                                                                 
 robot1.view(1);                                                                            % Side view
 
 % ------------------------------------------
-% Quizk way to flip which robot picks up what
-% temp = robot1;
-% robot1 = robot2;
-% robot2 = temp;
-% delete(temp);
-
 disp('Picking up top housing...');
-motion.moveRobot(robot1, topHousingPose * trotx(pi) * objectOffset);
-motion.moveRobot(robot1, topHousingPose * trotx(pi));
+motion.moveRobot(robot1, topHousingPose * trotx(pi) * objectOffset, 0);
+motion.moveRobot(robot1, topHousingPose * trotx(pi), 1);
 
 disp('Picking up PCB...');
-motion.moveRobot(robot2, pcbPose * trotx(pi) * objectOffset);
-motion.moveRobot(robot2, pcbPose * trotx(pi));
+motion.moveRobot(robot2, pcbPose * trotx(pi) * objectOffset, 1);
+motion.moveRobot(robot2, pcbPose * trotx(pi), 1);
 
 disp('Bringing PCB and top housing to midpoint...');
-motion.moveRobotAndPart(robot1, midpoint * trotx(pi), topHousing);
-motion.moveRobotAndPart(robot2, midpoint * trotx(pi), pcb);
+motion.moveRobotAndPart(robot1, origin * trotx(pi), topHousing);
+motion.moveRobotAndPart(robot2, origin * trotx(pi), pcb);
 
 disp('Picking up bottom housing...');
-motion.moveRobot(robot2, bottomHousingPose * trotx(pi) * objectOffset);
-motion.moveRobot(robot2, bottomHousingPose * trotx(pi));
+motion.moveRobot(robot2, bottomHousingPose * trotx(pi) * objectOffset, 1);
+motion.moveRobot(robot2, bottomHousingPose * trotx(pi), 1);
 
 disp('Bringing bottom housing to midpoint...');
-motion.moveRobotAndPart(robot2, midpoint * trotx(pi), bottomHousing);
+motion.moveRobotAndPart(robot2, origin * trotx(pi), bottomHousing);
 
 disp('Delivering components...');
-motion.moveRobotAndAllParts(robot1, boxPose, topHousing, pcb, bottomHousing);
+motion.moveRobotAndAllParts(robot1, boxPose * trotx(pi), topHousing, pcb, bottomHousing);
 
 % ------------------------------------------
 disp('Demonstration complete! :) ');
